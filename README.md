@@ -1,7 +1,9 @@
 # Town Editor
-A console application.
-User can:
-* Create their town
-* Manage buildings
-* Manage Routes (Stations)
-* Manage Citizens
+
+A console-based application for managing a virtual town.  
+
+### Features
+- Create and customize your town  
+- Manage different types of buildings (residential, facilities, etc.)  
+- Set up and manage routes and stations  
+- Manage citizens
