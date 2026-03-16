@@ -1,13 +1,25 @@
-#include "Station.h"
-#include "Building.h"
+#include "../include/Station.h"
+#include "../include/Building.h"
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
-Station::Station(const string& stationId, const string& name) : stationId(stationId), name(name) {}
+int Station::idCounter = 0;
+
+Station::Station(const string& name) : name(name) {
+    this->stationId = "ST" + to_string(++this->idCounter);
+}
+
+void Station::saveStations(std::ostream& out) const {
+    out << this->name;
+    for (const pair<Station*, int>& edge : this->edges) {
+        out << "    <-- " << to_string(edge.second) << " --> " << edge.first->name << endl;
+    }
+}
 
 void Station::setName(const string& name) { this->name = name; }
 void Station::addBuilding(Building* building) { this->buildings.push_back(building); }
@@ -23,7 +35,7 @@ bool Station::isEmpty() const {
 }
 
 auto Station::findEdge(Station* end) const {
-    return find_if(this->edges.begin(), this->edges.end(), [&](pair<Station*, int>& edge) { //lambd function [&] - captures surrounding veriables (end) by reference
+    return find_if(this->edges.begin(), this->edges.end(), [&](const pair<Station*, int>& edge) { //lambda function [&] - captures surrounding veriables (end) by reference
         return edge.first == end;
         });
 }
@@ -51,10 +63,11 @@ void Station::printBuildings(std::ostream& out) const {
      });
 }
 void Station::printEdges(std::ostream& out) const {
-    out << this->name;
-    for_each(this->edges.begin(), this->edges.end(), [&](pair<Station*, int> edge) {
-        out << "    <-" + to_string(edge.second) + "-> " + edge.first->name << endl;
+    out << this->name << endl;
+    for_each(this->edges.begin(), this->edges.end(), [&](const pair<Station*, int> edge) {
+        out << "    <-- " + to_string(edge.second) + " --> " + edge.first->name << endl;
         });
+    out << endl;
 }
 
 const string& Station::getName() const { return this->name; }

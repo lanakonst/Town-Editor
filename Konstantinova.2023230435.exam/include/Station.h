@@ -2,19 +2,23 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <iostream>
+#include <fstream>
 
 class Building;
 
 class Station {
 private:
+	static int idCounter;
 	std::string stationId;
 	std::string name;
 	std::vector<Building*> buildings;
 	std::vector<std::pair<Station*, int>> edges;
 
 public:
-	Station(const std::string& stationId, const std::string& name);
+	Station(const std::string& name);
 
+	void saveStations(std::ostream& out) const;
 	void setName(const std::string& name);
 	void addBuilding(Building* building);
 	void removeBuilding(Building* building);

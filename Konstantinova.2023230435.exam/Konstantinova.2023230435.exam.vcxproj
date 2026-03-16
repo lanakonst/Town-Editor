@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -24,6 +24,7 @@
     <ProjectGuid>{b37293d2-c170-4f7b-a5d6-d343153b929b}</ProjectGuid>
     <RootNamespace>Konstantinova2023230435exam</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Town.Editor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -128,27 +129,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Building.cpp" />
-    <ClCompile Include="BuildingMenu.cpp" />
-    <ClCompile Include="Character.cpp" />
-    <ClCompile Include="CharacterMenu.cpp" />
-    <ClCompile Include="Facility.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Residential.cpp" />
-    <ClCompile Include="Station.cpp" />
-    <ClCompile Include="Town.cpp" />
-    <ClCompile Include="TownMenu.cpp" />
-    <ClCompile Include="TownMenu.h" />
+    <ClInclude Include="include\Building.h" />
+    <ClInclude Include="include\Character.h" />
+    <ClInclude Include="include\Facility.h" />
+    <ClInclude Include="include\json.hpp" />
+    <ClInclude Include="include\menu\BuildingMenu.h" />
+    <ClInclude Include="include\menu\CharacterMenu.h" />
+    <ClInclude Include="include\menu\TownMenu.h" />
+    <ClInclude Include="include\Residential.h" />
+    <ClInclude Include="include\Station.h" />
+    <ClInclude Include="include\Town.h" />
+    <ClInclude Include="include\TownException.h" />
+    <ClInclude Include="include\TownManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Building.h" />
-    <ClInclude Include="BuildingMenu.h" />
-    <ClInclude Include="Character.h" />
-    <ClInclude Include="CharacterMenu.h" />
-    <ClInclude Include="Facility.h" />
-    <ClInclude Include="Residential.h" />
-    <ClInclude Include="Station.h" />
-    <ClInclude Include="Town.h" />
+    <ClCompile Include="src\Building.cpp" />
+    <ClCompile Include="src\BuildingMenu.cpp" />
+    <ClCompile Include="src\Character.cpp" />
+    <ClCompile Include="src\CharacterMenu.cpp" />
+    <ClCompile Include="src\Facility.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Residential.cpp" />
+    <ClCompile Include="src\Station.cpp" />
+    <ClCompile Include="src\Town.cpp" />
+    <ClCompile Include="src\TownMenu.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

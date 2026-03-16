@@ -1,12 +1,14 @@
-#include "Character.h"
+#include "../include/Character.h"
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-
-	Character::Character(const string& charId, const string& name, const string& lastName, const string& occupation, int age, int salary): 
-		charId(charId), name(name), lastName(lastName), occupation(occupation), age(age), salary(salary) {};
+int Character::idCounter = 0;
+	Character::Character(const string& name, const string& lastName, const string& occupation, int age, int salary): 
+		name(name), lastName(lastName), occupation(occupation), age(age), salary(salary) {
+		this->charId = "CH" + to_string(++this->idCounter);
+	};
 	void Character::setName(const string& name) { this->name = name; }
 	void Character::setLastName(const string& lastName) { this->lastName = lastName; }
 	void Character::setHome(Residential* home) { this->home = home; }
@@ -19,7 +21,7 @@ using namespace std;
 	void Character::resign() { this->workplace = nullptr; }
 
 	void Character::printData(ostream& out) const {
-		string toStr = this->name + " " + this->lastName + ", " + to_string(this->age) + " years, ";
+		string toStr = "id: " + this->charId + ", " + this->name + " " + this->lastName + ", " + to_string(this->age) + " years, ";
 		toStr += (this->checkHomeless()) ? " homeless " : (" lives in " + this->home->getName());
 		toStr += (this->checkUndemployed()) ? " unemployed" : ", works as " + (this->occupation + " in " + this->workplace->getName() + " for " + to_string(this->salary) + "$");
 

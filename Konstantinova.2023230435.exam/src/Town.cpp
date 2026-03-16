@@ -1,21 +1,90 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <ranges>
-#include "Town.h"
-#include "Character.h"
+#include "../include/Town.h"
+#include "../include/Character.h"
 
 using namespace std;
 
 Town::Town(string name) : name(name) {}
 void Town::setName(string name) { this->name = name; }
-void Town::saveTown() {}
+void Town::saveTown() {
+	string filename = this->name + ".txt";
+	ofstream outFile(filename);
+
+	if (!outFile) {
+		cerr << "Error opening file for writing!" << endl;
+		return;
+	}
+	outFile << this->name << '\n';
+
+	outFile << "Stations: {\n";
+	for (const auto& station : this->stations) {
+		station->saveStations(outFile);
+	}
+	outFile << "}\n";
+	outFile.close();
+
+}
+
+const vector<unique_ptr<Station>>& Town::getStations() const {
+	return this->stations;
+}
+
+const vector<unique_ptr<Character>>& Town::getCharacters() const {
+	return this->characters;
+}
+
+const vector<unique_ptr<Building>>& Town::getBuildings() const {
+	return this->buildings;
+}
+
+vector<unique_ptr<Character>>::const_iterator Town::findCharacterById(const string& charId) const {
+	auto it = find_if(this->characters.begin(), this->characters.end(), [&](const unique_ptr<Character>& character) {return character->getCharId() == charId; });
+	return it;
+}
+
+vector<unique_ptr<Building>>::const_iterator Town::findBuildingById(const string& buildingId) const {
+	auto it = find_if(this->buildings.begin(), this->buildings.end(), [&](const unique_ptr<Building>& building) {return building->getId() == buildingId; });
+	return it;
+}
+
+vector<unique_ptr<Station>>::const_iterator Town::findStationByName(const string& stationName) const {
+	auto it = find_if(this->stations.begin(), this->stations.end(), [&](const unique_ptr<Station>& station) {return station->getName() == stationName; });
+	return it;
+}
+
+vector<unique_ptr<Station>>::const_iterator Town::findStationById(const string& stationId) const {
+	auto it = find_if(this->stations.begin(), this->stations.end(), [&](const unique_ptr<Station>& station) {return station->getId() == stationId; });
+	return it;
+}
+
 
 void Town::printCharacters(ostream& out) const {
+	if (this->characters.empty()) {
+		out << "Town is empty" << endl;
+		return;
+	}
 	for_each(this->characters.begin(), this->characters.end(), [&](const unique_ptr<Character>& character) {character->printData(out); });
 }
+
+void Town::printHomeless(std::ostream& out) const {
+	vector<Character*> homeless = this->findHomeless();
+	if (homeless.empty()) {
+		out << "Everyone has a home" << endl;
+		return;
+	}
+	for_each(homeless.begin(), homeless.end(), [&](Character* character) {character->printData(out); });
+}
+
 void Town::printBuildings(ostream& out) const {
+	if (this->buildings.empty()) {
+		out << "There are no buildings" << endl;
+		return;
+	}
 	for_each(this->buildings.begin(), this->buildings.end(), [&](const unique_ptr<Building>& building) {building->printData(out); });
 }
 void Town::printData(ostream& out) const {
@@ -25,15 +94,36 @@ void Town::printData(ostream& out) const {
 	out << "Number of buildings: " << this->buildings.size() << endl;
 }
 void Town::printMap(ostream& out) const {
-	for_each(this->stations.begin(), this->stations.end(), [&](Station* station) {station->printEdges(out); });
+	if (this->stations.empty()) {
+		out << "There are no stations yet" << endl;
+		return;
+	}
+	for_each(this->stations.begin(), this->stations.end(), [&](const unique_ptr<Station>& station) {station->printEdges(out); });
 }
 
-void Town::addBuilding(unique_ptr<Building> building, Station* station) {
+void Town::printBuildingCharacters(ostream& out, const string& buildingId) const {
+	auto buildingIt = this->findBuildingById(buildingId);
+	if (buildingIt == this->buildings.end()) {
+		cout << "no buildings under id " << buildingId << endl;
+		return;
+	}
+	Building* building = buildingIt->get();
+	building->printData(out);
+}
+
+void Town::addBuilding(unique_ptr<Building> building, const string& stationName) {
+	auto stationIt = this->findStationByName(stationName);
+	if (stationIt == this->stations.end()) {
+		cout << "No station under this name" << endl;
+		return;
+	}
+	Station* station = stationIt->get();
 	Building* newBuilding = building.get();
 	this->buildings.push_back(move(building)); //to pass ownership of the smart pointer to Town
 	newBuilding->setStation(station);
 	station->addBuilding(newBuilding);
 }
+
 void Town::addCharacter(unique_ptr<Character> character) {
 	this->characters.push_back(move(character));
 }
@@ -46,8 +136,8 @@ void Town::addStation(unique_ptr<Station> station) {
 	}
 }
 
-void Town::removeStation(const string& stationId) {
-	auto stationToRemoveIT = this->findStationById(stationId);
+void Town::removeStation(const string& stationName) {
+	auto stationToRemoveIT = this->findStationByName(stationName);
 	if (stationToRemoveIT == this->stations.end()) {
 		cerr << "No stations under this id" << endl;
 		return;
@@ -131,32 +221,44 @@ void Town::hireCharacter(Character* character, Facility* building, int salary) {
 
 const string& Town::getName() const { return this->name; }
 
-auto Town::findCharacterById(const string& charId) const {
-	auto it = find_if(this->characters.begin(), this->characters.end(), [&](const unique_ptr<Character>& character) {return character->getCharId() == charId; });
-	return it;
-}
+void Town::connectStations(const string& startName, const string& endName, int dist) {
+	auto startIt = this->findStationByName(startName);
+	if (startIt == this->stations.end()) {
+		cout << "No stations under name " << startName << endl;
+		return;
+	}
+	auto endIt = this->findStationByName(endName);
+	if (endIt == this->stations.end()) {
+		cout << "No stations under name " << endName << endl;
+		return;
+	}
+	Station* start = startIt->get();
+	Station* end = endIt->get();
 
-auto Town::findBuildingById(const string& buildingId) const {
-	auto it = find_if(this->buildings.begin(), this->buildings.end(), [&](const unique_ptr<Building>& building) {return building->getId() == buildingId; });
-	return it;
-}
-
-auto Town::findStationByName(const string& stationName) const {
-	auto it = find_if(this->stations.begin(), this->stations.end(), [&](const unique_ptr<Station>& station) {return station->getName() == stationName; });
-	return it;
-}
-
-auto Town::findStationById(const string& stationId) const {
-	auto it = find_if(this->stations.begin(), this->stations.end(), [&](const unique_ptr<Station>& station) {return station->getId() == stationId; });
-	return it;
-}
-
-void Town::connectStations(Station* start, Station* end, int dist) {
 	start->addEdge(end, dist);
 	end->addEdge(start, dist);
 }
 
-vector<Station*> Town::findRoute(Station* start, Station* finish) const {}
+void Town::moveBuilding(const std::string& buildingId, const std::string& stationName) {
+	auto stationIt = this->findStationByName(stationName);
+	if (stationIt == this->stations.end()) {
+		cout << "stations under name " << stationName << endl;
+		return;
+	}
+	auto buildingIt = this->findBuildingById(buildingId);
+	if (buildingIt == this->buildings.end()) {
+		cout << "no buildings under id " << buildingId << endl;
+		return;
+	}
+	Station* station = stationIt->get();
+	Building* building = buildingIt->get();
+	*(building->getStation()) -= building;
+	*station += building;
+	building->setStation(station);
+	cout << "Buiding " << buildingId << " was moved to " << stationName << endl;
+}
+
+vector<Station*> Town::findRoute(Station* start, Station* finish) const { return {}; }
 
 vector<Residential*> Town::findFreeHouses() const {
 	vector<Residential*> freeBuildings;

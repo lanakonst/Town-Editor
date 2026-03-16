@@ -1,12 +1,15 @@
-#include "Building.h"
-#include "Station.h"
+#include "../include/Building.h"
+#include "../include/Station.h"
 #include <vector>
 #include <string>
 #include <iostream>
 #include <algorithm>
 using namespace std;
 
-Building::Building(const string& buildingId, const string& name): buildingId(buildingId), name(name) {} //Initializer List 
+int Building::idCounter = 0;
+
+
+Building::Building(const string& name) : name(name) {}  
 
 const string& Building::getId() const { return this->buildingId; }
 const string& Building::getName() const { return this->name; }

@@ -1,12 +1,16 @@
 #pragma once
+#include "Building.h"
 #include "Residential.h"
 #include "Facility.h"
-#include <string>;
+#include <string>
 
 class Building;
+class Facility;
+class Residential;
 
 class Character {
 private:
+	static int idCounter;
 	std::string charId, name, lastName, occupation;
 	Residential* home = nullptr;
 	Facility* workplace = nullptr;
@@ -14,7 +18,7 @@ private:
 	int salary = 0;
 
 public:
-	Character(const std::string& charId, const std::string& name, const std::string& lastName, const std::string& occupation, int age, int salary);
+	Character(const std::string& name, const std::string& lastName, const std::string& occupation, int age, int salary);
 	void setName(const std::string& name);
 	void setLastName(const std::string& lastName);
 	void setHome(Residential* home);
