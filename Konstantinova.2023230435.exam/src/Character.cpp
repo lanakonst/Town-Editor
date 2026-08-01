@@ -1,4 +1,5 @@
 #include "../include/Character.h"
+#include "../include/json.hpp"
 #include <iostream>
 #include <string>
 
@@ -39,5 +40,28 @@ int Character::idCounter = 0;
 	Residential* Character::getHome() const { return this->home; }
 	int Character::getAge() const { return this->age; }
 	int Character::getSalary() const { return this->salary; }
+
+	nlohmann::json Character::toJson() const {
+		nlohmann::json jsonCharacter;
+		jsonCharacter["charId"] = this->charId;
+		jsonCharacter["name"] = this->name;
+		jsonCharacter["lastName"] = this->lastName;
+		jsonCharacter["occupation"] = this->occupation;
+		jsonCharacter["age"] = this->age;
+		jsonCharacter["salary"] = this->salary;
+		if (this->home != nullptr) {
+			jsonCharacter["homeId"] = this->home->getId();
+		}
+		else {
+			jsonCharacter["homeId"] = nullptr;
+		}
+		if (this->workplace != nullptr) {
+			jsonCharacter["workplaceId"] = this->workplace->getId();
+		}
+		else {
+			jsonCharacter["workplaceId"] = nullptr;
+		}
+		return jsonCharacter;
+	}
 
 

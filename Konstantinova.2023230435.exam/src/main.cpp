@@ -9,10 +9,10 @@
 #include "../include/menu/CharacterMenu.h"
 #include "../include/menu/BuildingMenu.h"
 #include "../include/TownException.h"
-//#include "include/json.hpp"
+#include "../include/json.hpp"
 
 using namespace std;
-//using json = nlohmann::json;
+using json = nlohmann::json;
 
 void loadTown() {
 	string townName;
@@ -69,6 +69,7 @@ int main() {
 	int opt = 1;
 	while (opt != 0) {
 		try {
+			cout << "\n" << endl;
 			cout << "1. Create new town" << endl;
 			cout << "2. Load town" << endl;
 			cout << "0. Exit" << endl;

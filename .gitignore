@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Saves
+saves/*.json
+saves/.gitkeep #to keep the empty folder
+
 # User-specific files
 *.rsuser
 *.suo

@@ -10,6 +10,7 @@ void runCharacterMenu(Town* town) {
 	int opt = 1;
 	while (opt != 0) {
 		try {
+			cout << "\n" << endl;
 			cout << "1. Print characters" << endl;
 			cout << "2. Add character" << endl;
 			cout << "3. Choose character" << endl;
@@ -88,6 +89,7 @@ void runCharacterMenu(Town* town) {
 void runChooseCharacterMenu(Town* town, Character* character) {
 	int opt = 1;
 	while (opt != 0) {
+		cout << "\n" << endl;
 		cout << character->getName() << " " << character->getLastName() << endl;
 		cout << "1. Print data" << endl;
 		cout << "2. Move in a house" << endl;

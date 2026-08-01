@@ -3,6 +3,7 @@
 #include "Character.h"
 #include <vector>
 #include <string>
+#include "json.hpp"
 
 class Character;
 
@@ -19,5 +20,6 @@ public:
 
 	int getFreePlaces() const;
 	int getCapacity() const;
+	nlohmann::json toJson() const override;
 };
 

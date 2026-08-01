@@ -4,6 +4,7 @@
 #include <utility>
 #include <iostream>
 #include <fstream>
+#include "json.hpp"
 
 class Building;
 
@@ -17,8 +18,9 @@ private:
 
 public:
 	Station(const std::string& name);
+	nlohmann::json toJson() const;
 
-	void saveStations(std::ostream& out) const;
+	//void saveStations(std::ostream& out) const;
 	void setName(const std::string& name);
 	void addBuilding(Building* building);
 	void removeBuilding(Building* building);

@@ -1,9 +1,12 @@
 #include "../include/Facility.h"
+#include "../include/json.hpp"
+#include "../include/Station.h"
 #include <vector>
 #include <string>
 #include <iostream>
 
 using namespace std;
+using json = nlohmann::json;
 
 Facility::Facility(const string& type, const string& name) : Building(name), type(type) {
 	this->buildingId = "FC" + to_string(++this->idCounter);
@@ -21,3 +24,21 @@ const string& Facility::getType() const {
 }
 
 bool Facility::isResidential() const { return false; }
+
+json Facility::toJson() const {
+	json jsonFacility;
+	jsonFacility["id"] = this->buildingId;
+	jsonFacility["name"] = this->name;
+	jsonFacility["type"] = this->getType();
+	jsonFacility["workers"] = json::array();
+	for (const auto& worker : this->characters) {
+		jsonFacility["workers"].push_back(worker->getCharId());
+	}
+	if (this->station != nullptr) {
+		jsonFacility["stationId"] = this->station->getId();
+	}
+	else {
+		jsonFacility["stationId"] = nullptr;
+	}
+	return jsonFacility;
+}

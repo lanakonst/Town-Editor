@@ -1,5 +1,6 @@
 #include "../include/Station.h"
 #include "../include/Building.h"
+#include "../include/json.hpp"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -7,6 +8,7 @@
 #include <fstream>
 
 using namespace std;
+using json = nlohmann::json;
 
 int Station::idCounter = 0;
 
@@ -14,11 +16,34 @@ Station::Station(const string& name) : name(name) {
     this->stationId = "ST" + to_string(++this->idCounter);
 }
 
+/*
 void Station::saveStations(std::ostream& out) const {
     out << this->name;
     for (const pair<Station*, int>& edge : this->edges) {
         out << "    <-- " << to_string(edge.second) << " --> " << edge.first->name << endl;
     }
+}*/
+
+json Station::toJson() const {
+    json jsonStation;
+    jsonStation["id"] = this->stationId;
+    jsonStation["name"] = this->name;
+
+    jsonStation["buildings"] = json::array();
+    jsonStation["edges"] = json::array();
+
+
+    for (const auto& building : this->buildings) {
+        jsonStation["buildings"].push_back(building->getId());
+    }
+
+    for (const pair<Station*, int>& edge : this->edges) {
+        jsonStation["edges"].push_back({ 
+            {"stationId", edge.first->getId()}, 
+            {"dist", edge.second } 
+            });
+    }
+    return jsonStation;
 }
 
 void Station::setName(const string& name) { this->name = name; }

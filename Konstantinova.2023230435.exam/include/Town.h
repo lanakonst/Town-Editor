@@ -7,6 +7,7 @@
 #include "Building.h"
 #include "Facility.h"
 #include "Residential.h"
+#include "json.hpp"
 #include <memory>
 
 class Town {
@@ -21,6 +22,10 @@ public:
 	~Town() = default;
 	void setName(std::string name);
 	void saveTown();
+	
+	nlohmann::json toJson();
+
+	//Town loadTown(const std::string& filename) const;
 
 	const std::vector<std::unique_ptr<Station>>& getStations() const;
 	const std::vector<std::unique_ptr<Character>>& getCharacters() const;

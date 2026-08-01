@@ -3,6 +3,7 @@
 #include "Character.h"
 #include <vector>
 #include <string>
+#include "json.hpp"
 
 class Character;
 
@@ -16,6 +17,7 @@ public:
 	void printData(std::ostream& out) const override;
 	const std::string& getType() const override;
 	bool isResidential() const override;
+	nlohmann::json toJson() const override;
 
 };
 

@@ -3,6 +3,7 @@
 #include "Residential.h"
 #include "Facility.h"
 #include <string>
+#include "json.hpp"
 
 class Building;
 class Facility;
@@ -43,6 +44,8 @@ public:
 	Residential* getHome() const;
 	int getAge() const;
 	int getSalary() const;
+
+	nlohmann::json toJson() const;
 
 };
 

@@ -45,9 +45,6 @@
     <ClInclude Include="include\TownException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TownManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\menu\BuildingMenu.h">
       <Filter>Header Files\Menu</Filter>
     </ClInclude>

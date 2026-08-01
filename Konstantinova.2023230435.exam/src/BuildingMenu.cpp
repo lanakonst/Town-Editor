@@ -10,6 +10,7 @@ void runBuildingMenu(Town* town) {
 
 	while (opt != 0) {
 		try {
+			cout << "\n" << endl;
 			cout << "1. Print buildings" << endl;
 			cout << "2. Add building" << endl;
 			cout << "3. Remove building" << endl;
@@ -32,6 +33,8 @@ void runBuildingMenu(Town* town) {
 						cout << "Add at least one station before adding any buildings" << endl;
 						break;
 					}
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					string station;
 					cout << "Enter station name: ";
 					getline(cin, station, '\n');

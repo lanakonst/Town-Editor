@@ -4,31 +4,73 @@
 #include <vector>
 #include <algorithm>
 #include <ranges>
+#include <filesystem>
 #include "../include/Town.h"
 #include "../include/Character.h"
+#include "../include/json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 Town::Town(string name) : name(name) {}
 void Town::setName(string name) { this->name = name; }
+
+json Town::toJson() {
+	json jsonTown;
+	jsonTown["name"] = this->name;
+	jsonTown["stations"] = json::array();
+	jsonTown["buildings"] = json::array();
+	jsonTown["characters"] = json::array();
+	for (const auto& station : this->stations) {
+		jsonTown["stations"].push_back(station->toJson());
+	}
+
+	for (const auto& building : this->buildings) {
+		jsonTown["buildings"].push_back(building->toJson());
+	}
+
+	for (const auto& character : this->characters) {
+		jsonTown["characters"].push_back(character->toJson());
+	}
+	return jsonTown;
+}
+
 void Town::saveTown() {
-	string filename = this->name + ".txt";
+	std::filesystem::create_directory("saves");
+
+	string filename = "saves/" + this->name + ".json";
 	ofstream outFile(filename);
 
 	if (!outFile) {
 		cerr << "Error opening file for writing!" << endl;
 		return;
 	}
-	outFile << this->name << '\n';
-
-	outFile << "Stations: {\n";
-	for (const auto& station : this->stations) {
-		station->saveStations(outFile);
-	}
-	outFile << "}\n";
+	outFile << toJson() << '\n';
 	outFile.close();
-
+	cout << "Town saved to " << filename << endl;
 }
+
+/*Town Town::loadTown(const string& filename) const {
+	ifstream inFile(filename);
+	if (!inFile) {
+		cerr << "There is no such town" << endl;
+		return Town("");
+	}
+	string townName;
+	getline(inFile, townName);
+	Town loadedTown(townName);
+	string line;
+	while (getline(inFile, line)) {
+		if (line == "Stations: {") {
+			while (getline(inFile, line) && line != "}") {
+				// Parse station data and create Station objects
+				// Add them to loadedTown.stations
+			}
+		}
+	}
+	inFile.close();
+	return loadedTown;
+}*/
 
 const vector<unique_ptr<Station>>& Town::getStations() const {
 	return this->stations;

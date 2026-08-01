@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "json.hpp"
 
 class Character; //circular dependency
 class Station;
@@ -29,7 +30,8 @@ public:
     Building& operator +=(Character* character);
     Building& operator -=(Character* character);
 
-    virtual void printData(std::ostream& out) const = 0;
+    virtual void printData(std::ostream& out) const = 0; // = 0 means it's a pure virtual finction and must be overriden
     virtual bool isResidential() const = 0;
     virtual const std::string& getType() const = 0;
+    virtual nlohmann::json toJson() const = 0;
 };

@@ -9,6 +9,7 @@ void runTownMenu(Town* town) {
 	int opt = 1;
 	while (opt != 0) {
 		try {
+			cout << "\n" << endl;
 			cout << "1. Change name" << endl;
 			cout << "2. Print data" << endl;
 			cout << "3. Print map" << endl;
@@ -41,7 +42,7 @@ void runTownMenu(Town* town) {
 				break;
 			} case 4: {
 				string stationName;
-				cout << "Enter satation name: " << endl;
+				cout << "Enter satation name: ";
 				cin.ignore();
 				getline(cin, stationName);
 				town->addStation(make_unique<Station>(stationName));

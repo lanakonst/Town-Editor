@@ -1,9 +1,12 @@
 #include "../include/Residential.h"
+#include "../include/Station.h"
+#include "../include/json.hpp"
 #include <vector>
 #include <string>
 #include <iostream>
 
 using namespace std;
+using json = nlohmann::json;
 
 Residential::Residential(int capacity, const string& name) :Building(name), capacity(capacity) {
 	this->buildingId = "RS" + to_string(++this->idCounter);
@@ -30,3 +33,22 @@ int Residential::getCapacity() const {
 }
 
 bool Residential::isResidential() const { return true; }
+
+json Residential::toJson() const {
+	json jsonResidential;
+	jsonResidential["id"] = this->buildingId;
+	jsonResidential["name"] = this->name;
+	jsonResidential["type"] = this->getType();
+	jsonResidential["capacity"] = this->capacity;
+	jsonResidential["residents"] = json::array();
+	for (const auto& resident : this->characters) {
+		jsonResidential["residents"].push_back(resident->getCharId());
+	}
+	if (this->station != nullptr) {
+		jsonResidential["stationId"] = this->station->getId();
+	}
+	else {
+		jsonResidential["stationId"] = nullptr;
+	}
+	return jsonResidential;
+}
