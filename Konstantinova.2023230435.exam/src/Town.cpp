@@ -11,9 +11,30 @@
 
 using namespace std;
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 Town::Town(string name) : name(name) {}
-void Town::setName(string name) { this->name = name; }
+void Town::setName(string newName) { 
+	string oldFile = "saves/" + this->name + ".json";
+	string newFile = "saves/" + newName + ".json";
+
+	if (fs::exists(newFile)) {
+		cerr << "A town with the name " << newName << " already exists. Please choose a different name." << endl;
+		return;
+	}
+
+	if (fs::exists(oldFile)) {
+		try {
+			fs::rename(oldFile, newFile);
+		}
+		catch (const fs::filesystem_error& e) {
+			cerr << "Could not rename save file: " << e.what() << endl;
+			return;
+		}
+	}
+
+	this->name = newName;
+}
 
 json Town::toJson() {
 	json jsonTown;
@@ -50,27 +71,97 @@ void Town::saveTown() {
 	cout << "Town saved to " << filename << endl;
 }
 
-/*Town Town::loadTown(const string& filename) const {
+
+Town Town::loadTown(const string& filename) {
 	ifstream inFile(filename);
 	if (!inFile) {
 		cerr << "There is no such town" << endl;
 		return Town("");
 	}
-	string townName;
-	getline(inFile, townName);
-	Town loadedTown(townName);
-	string line;
-	while (getline(inFile, line)) {
-		if (line == "Stations: {") {
-			while (getline(inFile, line) && line != "}") {
-				// Parse station data and create Station objects
-				// Add them to loadedTown.stations
-			}
+
+	json townJson = json::parse(inFile);
+
+	Town town(townJson["name"]);
+
+	town.loadStations(townJson["stations"]);
+	town.loadBuildings(townJson["buildings"]);
+	town.loadCharacters(townJson["characters"]);
+
+	return town;
+
+}
+void Town::loadStations(const json& json) {
+	for (const auto& stationInfo : json) {
+		this->addStation(make_unique<Station>(stationInfo["name"], stationInfo["id"]));
+	}
+
+	for (const auto& stationInfo : json) {
+		string startName = stationInfo["name"];
+		
+		for (const auto& edge : stationInfo["edges"]) {
+			auto endStationIt = findStationById(edge["stationId"]);
+				if (endStationIt != stations.end()) {
+					string endName = endStationIt->get()->getName();
+					this->connectStations(startName, endName, edge["dist"]);
+				}
+		}
+		
+	}
+}
+
+void Town::loadBuildings(const json& json) {
+	for (const auto& buildingInfo : json) {
+		string type = buildingInfo["type"];
+		unique_ptr<Building> building;
+		if (type == "Residential") {
+			building = make_unique<Residential>(buildingInfo["capacity"], buildingInfo["name"], buildingInfo["id"]);
+		}
+		else if (type == "Facility") {
+			building = make_unique<Facility>(type, buildingInfo["name"], buildingInfo["id"]);
+		}
+		else {
+			cerr << "Unknown building type: " << type << endl;
+			continue;
+		}
+
+		auto stationIt = findStationById(buildingInfo["stationId"]);
+		if (stationIt != stations.end()) {
+			addBuilding(move(building), stationIt->get()->getName());
 		}
 	}
-	inFile.close();
-	return loadedTown;
-}*/
+}
+
+void Town::loadCharacters(const json& json) {
+	for (const auto& characterInfo : json) {
+		unique_ptr<Character> character = make_unique<Character>(
+			characterInfo["name"],
+			characterInfo["lastName"],
+			characterInfo["occupation"],
+			characterInfo["age"],
+			characterInfo["salary"],
+			characterInfo["charId"]
+		);
+	if(characterInfo.contains("homeId") && !characterInfo["homeId"].is_null()) {
+		auto buildingIt = this->findBuildingById(characterInfo["homeId"]);
+		if (buildingIt != this->buildings.end()) {
+			Residential* home = dynamic_cast<Residential*>(buildingIt->get());
+			character->setHome(home);
+			*home += character.get();
+		}
+	}
+
+	if (characterInfo.contains("workplaceId") && !characterInfo["workplaceId"].is_null()) {
+		auto buildingIt = this->findBuildingById(characterInfo["workplaceId"]);
+		if (buildingIt != this->buildings.end()) {
+			Facility* work = dynamic_cast<Facility*>(buildingIt->get());
+			character->setWorkplace(work);
+			*work += character.get();
+		}
+	}
+
+		this->addCharacter(move(character));
+	}
+}
 
 const vector<unique_ptr<Station>>& Town::getStations() const {
 	return this->stations;
@@ -326,167 +417,3 @@ vector<Character*> Town::findHomeless() const {
 	}
 	return homeless;
 }
-
-/*
-
-Town::Town(string name) {
-		this->name = name;
-	}
-
-void Town::setName(string name) { this->name = name; }
-
-	
-	void printData();
-	void printCharacters();
-	void printBuildings();
-
-void Town::addBuilding(unique_ptr<Building> building) {
-		
-		buildings.push_back(move(building));
-	}
-
-void Town::addCharacter(unique_ptr<Character> character) {
-		
-		this->characters.push_back(move(character));
-	}
-
-void Town::removeBuilding(string buildingId) {
-		if (nOfbuildings == 0) {
-			cout << "There are no buildings to remove" << endl;
-			return;
-		}
-		auto it = find_if(buildings.begin(), buildings.end(), [buildingId](const unique_ptr<Building>& building) {
-			return building->getId() == buildingId;
-			});
-		if (it == buildings.end()) {
-			cout << "There is no such building" << endl;
-		}
-		else {
-			const unique_ptr<Building>& buildingToremove = *it;
-			buildingToremove->removeAllCharacters();
-			buildings.erase(it);
-			nOfbuildings -= 1;
-			cout << "Building number " << buildingId << " is successfully removed" << endl;
-		}
-	}
-
-void Town::removeCharacter(string characterId) {
-		if (nOfCharacters == 0) {
-			cout << "There are no characters to remove" << endl;
-			return;
-		}
-		auto it = find_if(characters.begin(), characters.end(), [characterId](const unique_ptr<Character>& character) {
-			return character->getCharId() == characterId;
-			});
-		if (it == characters.end()) {
-			cout << "There is no such character" << endl;
-		}
-		else {
-			Character* charToRemove = it->get();
-			Building* building = charToRemove->getBuilding();
-			*building -= *charToRemove;
-			characters.erase(it);
-			nOfCharacters -= 1;
-			cout << "Character number " << characterId << " is successfully removed" << endl;
-		}
-	}
-
-void Town::printData(ostream& out) const{
-	out << this->name << " Town " << endl;
-	out << "Number of buildings: " << this->nOfbuildings;
-	out << "Number of characters: " << this->nOfCharacters;
-}
-
-
-void Town::printCharacters(ostream& out) const{
-	for (const auto& character : this->characters) character->printData(out);
-}
-void Town::printBuildings(ostream& out) const {
-	for (const auto& building : this->buildings) building->printData(out);
-}
-	
-	void printHomeless();
-	vector<Building*> findFreeHouses();
-
-	void saveTown();
-
-
-
-
-
-class Town {
-private:
-	string name;
-	int nOfCharacters = 0, nOfbuildings = 0;
-	vector<unique_ptr<Character>> characters;
-	vector<unique_ptr<Building>> buildings;
-public:
-	Town(string name) {
-		this->name = name;
-	};
-	void setName(string name) { this->name = name; };
-
-	/*
-	void printData();
-	void printCharacters();
-	void printBuildings();
-
-	void addBuilding(unique_ptr<Building> building) {
-		nOfbuildings += 1;
-		buildings.push_back(building);
-	}
-
-	void addCharacter(unique_ptr<Character> character) {
-		this->nOfCharacters += 1;
-		this->characters.push_back(character);
-	}
-
-	void removeBuilding(string buildingId) {
-		if (nOfbuildings == 0) {
-			cout << "There are no buildings to remove" << endl;
-			return;
-		}
-		auto it = find_if(buildings.begin(), buildings.end(), [buildingId](Building* building) {
-			return building->getId() == buildingId;
-			});
-		if (it == buildings.end()) {
-			cout << "There is no such building" << endl;
-		}
-		else {
-			unique_ptr<Building>& buildingToremove = *it;
-			buildingToremove->removeAll();
-			buildings.erase(it);
-			nOfbuildings -= 1;
-			cout << "Building number " << buildingId << " is successfully removed" << endl;
-		}
-	}
-	void removeCharacter(string characterId) {
-		if (nOfCharacters == 0) {
-			cout << "There are no characters to remove" << endl;
-			return;
-		}
-		auto it = find_if(characters.begin(), characters.end(), [characterId](Character* character) {
-			return character->getCharId() == characterId;
-			});
-		if (it == characters.end()) {
-			cout << "There is no such character" << endl;
-		}
-		else {
-			Character * charToRemove = it->get();
-			Building* building = charToRemove->getBuilding();
-			*building -= *charToRemove;
-			characters.erase(it);
-			nOfCharacters -= 1;
-			cout << "Character number " << characterId << " is successfully removed" << endl;
-		}
-	}
-
-	
-	void printHomeless();
-	vector<Building*> findFreeHouses();
-
-	void saveTown();
-
-
-};
-*/

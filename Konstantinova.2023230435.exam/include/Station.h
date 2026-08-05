@@ -17,7 +17,7 @@ private:
 	std::vector<std::pair<Station*, int>> edges;
 
 public:
-	Station(const std::string& name);
+	Station(const std::string& name, const std::string& id = "");
 	nlohmann::json toJson() const;
 
 	//void saveStations(std::ostream& out) const;

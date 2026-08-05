@@ -1,1 +1,44 @@
-{"buildings":[{"capacity":5,"id":"RS1","name":"building1","residents":[],"stationId":"ST1","type":"Residential"}],"characters":[],"name":"OneMoreNewTown","stations":[{"buildings":["RS1"],"edges":[{"dist":15,"stationId":"ST2"}],"id":"ST1","name":"station1"},{"buildings":[],"edges":[{"dist":15,"stationId":"ST1"}],"id":"ST2","name":"station2"},{"buildings":[],"edges":[],"id":"ST3","name":"station3"}]}
+{
+  "buildings": [
+    {
+      "capacity": 5,
+      "id": "RS1",
+      "name": "building1",
+      "residents": [],
+      "stationId": "ST1",
+      "type": "Residential"
+    }
+  ],
+  "characters": [],
+  "name": "OneMoreNewTown",
+  "stations": [
+    {
+      "buildings": [ "RS1" ],
+      "edges": [
+        {
+          "dist": 15,
+          "stationId": "ST2"
+        }
+      ],
+      "id": "ST1",
+      "name": "station1"
+    },
+    {
+      "buildings": [],
+      "edges": [
+        {
+          "dist": 15,
+          "stationId": "ST1"
+        }
+      ],
+      "id": "ST2",
+      "name": "station2"
+    },
+    {
+      "buildings": [],
+      "edges": [],
+      "id": "ST3",
+      "name": "station3"
+    }
+  ]
+}

@@ -12,8 +12,14 @@ using json = nlohmann::json;
 
 int Station::idCounter = 0;
 
-Station::Station(const string& name) : name(name) {
-    this->stationId = "ST" + to_string(++this->idCounter);
+Station::Station(const string& name, const string& id) : name(name) {
+    if (!id.empty()) {
+        this->stationId = id;
+        ++this->idCounter;
+    }
+    else {
+        this->stationId = "ST" + to_string(++this->idCounter);
+    }
 }
 
 /*

@@ -6,9 +6,15 @@
 using namespace std;
 
 int Character::idCounter = 0;
-	Character::Character(const string& name, const string& lastName, const string& occupation, int age, int salary): 
+	Character::Character(const string& name, const string& lastName, const string& occupation, int age, int salary, const string& id) :
 		name(name), lastName(lastName), occupation(occupation), age(age), salary(salary) {
-		this->charId = "CH" + to_string(++this->idCounter);
+		if (!id.empty()) {
+			this->charId = id;
+			++this->idCounter;
+		}
+		else {
+			this->charId = "CH" + to_string(++this->idCounter);
+		}
 	};
 	void Character::setName(const string& name) { this->name = name; }
 	void Character::setLastName(const string& lastName) { this->lastName = lastName; }

@@ -31,7 +31,8 @@ void runTownMenu(Town* town) {
 			case 1: {
 				string newName;
 				cout << "New name: ";
-				cin >> newName;
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				getline(cin, newName);
 				town->setName(newName);
 				break;
 			} case 2: {

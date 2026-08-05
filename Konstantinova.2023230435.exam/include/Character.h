@@ -19,7 +19,7 @@ private:
 	int salary = 0;
 
 public:
-	Character(const std::string& name, const std::string& lastName, const std::string& occupation, int age, int salary);
+	Character(const std::string& name, const std::string& lastName, const std::string& occupation, int age, int salary, const std::string& id = "");
 	void setName(const std::string& name);
 	void setLastName(const std::string& lastName);
 	void setHome(Residential* home);

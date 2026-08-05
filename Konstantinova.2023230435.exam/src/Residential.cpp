@@ -8,8 +8,15 @@
 using namespace std;
 using json = nlohmann::json;
 
-Residential::Residential(int capacity, const string& name) :Building(name), capacity(capacity) {
-	this->buildingId = "RS" + to_string(++this->idCounter);
+Residential::Residential(int capacity, const string& name, const string& id) :Building(name), capacity(capacity) {
+	if (!id.empty()) {
+		this->buildingId = id;
+		++this->idCounter;
+	}
+	else {
+		this->buildingId = "RS" + to_string(++this->idCounter);
+	}
+	
 }
 
 void Residential::printData(ostream& out) const {

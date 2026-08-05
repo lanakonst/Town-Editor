@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <filesystem>
 #include "../include/Town.h"
 #include "../include/Residential.h"
 #include "../include/Character.h"
@@ -13,13 +14,8 @@
 
 using namespace std;
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
-void loadTown() {
-	string townName;
-	cout << "Enter town name to load: ";
-	cin >> townName;
-	string fName = townName + ".txt";
-}
 
 void runMainMenu(Town* town) {
 	int opt = 1;
@@ -63,6 +59,43 @@ void runMainMenu(Town* town) {
 	}
 }
 
+vector<string> getSavedTowns() {
+	vector<string> towns;
+
+	if (!fs::exists("saves")) {
+		return towns;
+	}
+
+	for (const auto& entry : fs::directory_iterator("saves")) {
+		if (entry.path().extension() == ".json") {
+			towns.push_back(entry.path().stem().string());
+		}
+	}
+
+	return towns;
+}
+
+void loadTown() {
+	vector<string> savedTowns = getSavedTowns();
+	cout << endl;
+	for (int i = 0; i < savedTowns.size(); ++i) {
+		cout << i << ". " << savedTowns[i] << endl;
+	}
+
+	int townId;
+	cout << "Enter town id to load or -1 to exit: ";
+	cin >> townId;
+	if (townId == -1) { return; }
+	if (townId < 0 || townId >= savedTowns.size()) {
+		throw TownException("Invalid town id");
+	}
+
+	string fName = "saves/" + savedTowns[townId] + ".json";
+	Town town = Town::loadTown(fName);
+
+	runMainMenu(&town);
+}
+
 
 int main() {
 	cout << "Welcome!" << endl;
@@ -85,12 +118,19 @@ int main() {
 				case 1: {
 					string townName;
 					cout << "Name your town: ";
-					cin >> townName;
-					auto town = make_unique<Town>(townName);
-					runMainMenu(town.get()); //check for nullptr
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					getline(cin, townName);
+					string newTownFile = "saves/" + townName + ".json";
+					if (fs::exists(newTownFile)) {
+						throw TownException("Town with this name already exists");
+					}
+					else {
+						auto town = make_unique<Town>(townName);
+						runMainMenu(town.get()); //check for nullptr
+					}
 					break;
 				} case 2: {
-					cout << "town loaded" << endl;
+					loadTown();
 					break;
 				} case 0: {
 					break;

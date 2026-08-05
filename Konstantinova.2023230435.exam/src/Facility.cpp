@@ -8,8 +8,14 @@
 using namespace std;
 using json = nlohmann::json;
 
-Facility::Facility(const string& type, const string& name) : Building(name), type(type) {
-	this->buildingId = "FC" + to_string(++this->idCounter);
+Facility::Facility(const string& type, const string& name, const string& id) : Building(name), type(type) {
+	if (!id.empty()) {
+		this->buildingId = id;
+		++this->idCounter;
+	}
+	else {
+		this->buildingId = "FC" + to_string(++this->idCounter);
+	}
 }
 
 void Facility::printData(ostream& out) const {

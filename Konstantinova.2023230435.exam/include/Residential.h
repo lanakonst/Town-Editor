@@ -12,7 +12,7 @@ private:
 	int capacity;
 
 public:
-	Residential(int capacity, const std::string& name);
+	Residential(int capacity, const std::string& name, const std::string& id = "");
 
 	void printData(std::ostream& out) const override;
 	const std::string& getType() const override;

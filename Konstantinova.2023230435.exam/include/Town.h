@@ -20,12 +20,22 @@ private:
 public:
 	Town(std::string name);
 	~Town() = default;
+
+	Town(const Town&) = delete;
+	Town& operator=(const Town&) = delete;
+
+	Town(Town&&) = default;
+	Town& operator=(Town&&) = default;
+
 	void setName(std::string name);
 	void saveTown();
 	
 	nlohmann::json toJson();
 
-	//Town loadTown(const std::string& filename) const;
+	static Town loadTown(const std::string& filename); //static because it doesn't require an instance of Town to be called (belongs to the class and not the instance)
+	void loadStations(const nlohmann::json& json);
+	void loadBuildings(const nlohmann::json& json);
+	void loadCharacters(const nlohmann::json& json);
 
 	const std::vector<std::unique_ptr<Station>>& getStations() const;
 	const std::vector<std::unique_ptr<Character>>& getCharacters() const;
