@@ -22,14 +22,6 @@ Station::Station(const string& name, const string& id) : name(name) {
     }
 }
 
-/*
-void Station::saveStations(std::ostream& out) const {
-    out << this->name;
-    for (const pair<Station*, int>& edge : this->edges) {
-        out << "    <-- " << to_string(edge.second) << " --> " << edge.first->name << endl;
-    }
-}*/
-
 json Station::toJson() const {
     json jsonStation;
     jsonStation["id"] = this->stationId;

@@ -280,6 +280,9 @@ void Town::removeStation(const string& stationName) {
 		cout << "Please move all building to another stations before deleting" << endl;
 		return;
 	}
+	for (auto& connectedStations : stationToRemove->getEdges()) {
+		connectedStations.first->removeEdge(stationToRemove);
+	}
 	this->stations.erase(stationToRemoveIT);
 	cout << "Station is removed" << endl;
 }
